@@ -72,30 +72,47 @@ class Application(Gtk.Application):
     self.statusIcon.connect('button-release-event', self.handleTrayBtnRelease)
   
   
+  def handleTimerStartClick(self, menuItem, timerDict):
+    print('start', timerDict)
+  
+  
+  def handleTimerEditClick(self, menuItem, timerDict, ndx):
+    self.openTimerEditor(
+      timerDict=timerDict,
+      timerNdx=ndx
+    )
+  
+  
   def handleTrayBtnRelease(self, icon, x, y, button, time, panel_position):
     match button:
       case 1: # left-click
         print('open timers')
         
       case 3: # right-click
-        menu = Gtk.Menu()
-        sep = Gtk.SeparatorMenuItem()
+        menu = Gtk.Menu.new()
         
-        # TODO: if there are saved timers, add them at the top of the list
-        # iterate each item
-        #  item = Gtk.MenuItem(label='Start Timer: <NAME>')
-        #  item.connect('activate', self.handleTimerStartClick)
-        #  menu.append(item)
-        # add a separator
-        # menu.append(sep)
+        if self.config['timers']:
+          for ndx, timerDict in enumerate(self.config['timers']):
+            timerItem = Gtk.MenuItem.new_with_label(f"[ {timerDict['name']} ] ( {str(timerDict['hours']).rjust(2, '0')}:{str(timerDict['mins']).rjust(2, '0')} )")
+            subMenu = Gtk.Menu.new()
+            startItem = Gtk.MenuItem.new_with_label('Start')
+            startItem.connect('activate', self.handleTimerStartClick, timerDict)
+            subMenu.append(startItem)
+            editItem = Gtk.MenuItem.new_with_label('Edit')
+            editItem.connect('activate', self.handleTimerEditClick, timerDict, ndx)
+            subMenu.append(editItem)
+            timerItem.set_submenu(subMenu)
+            menu.append(timerItem)
+          
+          menu.append(Gtk.SeparatorMenuItem.new())
         
-        item = Gtk.MenuItem(label='Create Timer')
+        item = Gtk.MenuItem.new_with_label('Create Timer')
         item.connect('activate', self.createTimer)
         menu.append(item)
         
-        menu.append(sep)
+        menu.append(Gtk.SeparatorMenuItem.new())
         
-        item = Gtk.MenuItem(label='Quit')
+        item = Gtk.MenuItem.new_with_label('Quit')
         item.connect('activate', self.quitApp)
         menu.append(item)
         
@@ -110,45 +127,54 @@ class Application(Gtk.Application):
         self.statusIcon.popup_menu(menu, x-menuOffset, y, button, time, panel_position)
   
   
-  def saveTimer(self, name, hours, mins, color):
+  def saveTimer(self, name, hours, mins, color, timerNdx=None):
     if 'timers' not in self.config:
       self.config['timers'] = []
     
     colorTuple=eval(color.to_string().replace('rgb', ''))
     colorHex = '#{:02x}{:02x}{:02x}'.format(*colorTuple)
     
-    self.config['timers'].append({
+    timerDict = {
       'color': colorHex,
       'hours': int(hours),
       'mins': int(mins),
       'name': name
-    })
+    }
+    
+    if timerNdx is None:
+      self.config['timers'].append(timerDict)
+    else:
+      self.config['timers'][timerNdx] = timerDict
     
     self.saveConfig()
   
   
-  def createTimer(self, *args):
+  def openTimerEditor(self, timerDict=None, timerNdx=None):
     dialog = Gtk.Dialog()
     dialog.set_icon_name('document-open-recent')
-    dialog.set_title('Create a Timer')
+    title = 'Create a Timer' if timerDict is None else 'Edit Timer'
+    dialog.set_title(title)
     
     grid = Gtk.Grid.new()
-    grid.set_name('createTimerDialogContent')
+    grid.set_name('timerEditorDialogContent')
     
     nameLabel = Gtk.Label.new('Timer Name:  ')
     nameInput = Gtk.Entry.new()
+    if timerDict is not None: nameInput.set_text(timerDict['name'])
     grid.attach(nameLabel, 0, 0, 1, 1)
     grid.attach(nameInput, 1, 0, 1, 1)
     
     hrsLabel = Gtk.Label.new('Hours:  ')
     hrsLabel.set_xalign(1)
     hrsInput = Gtk.SpinButton.new_with_range(0, 23, 1)
+    if timerDict is not None: hrsInput.set_value(timerDict['hours'])
     grid.attach(hrsLabel, 0, 1, 1, 1)
     grid.attach(hrsInput, 1, 1, 1, 1)
     
     minsLabel = Gtk.Label.new('Minutes:  ')
     minsLabel.set_xalign(1)
     minsInput = Gtk.SpinButton.new_with_range(0, 59, 1)
+    if timerDict is not None: minsInput.set_value(timerDict['mins'])
     grid.attach(minsLabel, 0, 2, 1, 1)
     grid.attach(minsInput, 1, 2, 1, 1)
     
@@ -156,6 +182,7 @@ class Application(Gtk.Application):
     clrLabel.set_xalign(1)
     defaultColor = Gdk.RGBA()
     defaultColor.parse('#00C487')
+    if timerDict is not None: defaultColor.parse(timerDict['color'])
     clrBtn = Gtk.ColorButton.new_with_rgba(defaultColor)
     grid.attach(clrLabel, 0, 3, 1, 1)
     grid.attach(clrBtn, 1, 3, 1, 1)
@@ -166,7 +193,8 @@ class Application(Gtk.Application):
     dialog.get_action_area().set_layout(Gtk.ButtonBoxStyle.EXPAND)
     
     dialog.add_button('Cancel', 0)
-    dialog.add_button('Create', 1)
+    submitBtnLabel = 'Create' if timerDict is None else 'Update'
+    dialog.add_button(submitBtnLabel, 1)
     
     def handleCreateDialogResponse(_dialog, code):
       match code:
@@ -175,13 +203,18 @@ class Application(Gtk.Application):
             nameInput.get_text(),
             hrsInput.get_value(),
             minsInput.get_value(),
-            clrBtn.get_rgba()
+            clrBtn.get_rgba(),
+            timerNdx=timerNdx
           )
       _dialog.close()
     
     dialog.connect('response', handleCreateDialogResponse)
     
     dialog.show_all()
+  
+  
+  def createTimer(self, *args):
+    self.openTimerEditor()
   
   
   def quitApp(self, *args):
