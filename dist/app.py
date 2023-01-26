@@ -13,9 +13,34 @@ from gi.repository import Gdk, Gio, GLib, Gtk, XApp
 
 APPLICATION_ID = 'com.nox.eggtimer'
 DIR_NAME = os.path.dirname(__file__)
+ICON_NAME = 'document-open-recent'
 STYLE_SHEET_PATH = os.path.join(DIR_NAME, 'app.css')
 PATH__CONFIG_DIR = os.path.join(GLib.get_user_config_dir(), 'eggtimer')
 PATH__CONFIG_FILE = os.path.join(PATH__CONFIG_DIR, 'config.json');
+
+
+class Dialog(Gtk.Dialog):
+  def __init__(self):
+    super(Dialog, self).__init__()
+    styleCtx = self.get_style_context()
+    Gtk.StyleContext.add_class(styleCtx, 'eggtimer-dialog')
+    self.set_icon_name(ICON_NAME)
+    
+    # add a styling class to the body
+    contentArea = self.get_content_area()
+    self.body = Gtk.Box.new(Gtk.Orientation.VERTICAL, 10)
+    contentArea.pack_start(self.body, True, True, 0)
+    styleCtx = self.body.get_style_context()
+    Gtk.StyleContext.add_class(styleCtx, 'eggtimer-dialog__body')
+    
+    # make the buttons stretch to fill available area.
+    # NOTE: There's the `get_action_area` method which gets the same element,
+    # but it also outputs a deprecation warning, so doing this for now.
+    self.action_area.set_layout(Gtk.ButtonBoxStyle.EXPAND)
+  
+  def setBody(self, content):
+    self.body.pack_start(content, True, True, 0)
+
 
 class Application(Gtk.Application):
 
@@ -62,7 +87,7 @@ class Application(Gtk.Application):
   def createStatusIcon(self):
     self.statusIcon = XApp.StatusIcon()
     self.statusIcon.set_name('egg-timer')
-    self.statusIcon.set_icon_name('document-open-recent')
+    self.statusIcon.set_icon_name(ICON_NAME)
     self.statusIcon.set_tooltip_text('%s\n<i>%s</i>\n<i>%s</i>' % (
       'Egg Timer',
       'Left-click to view timers',
@@ -83,6 +108,27 @@ class Application(Gtk.Application):
     )
   
   
+  def handleTimerDeleteClick(self, menuItem, timerDict, ndx):
+    dialog = Dialog()
+    dialog.set_title('Delete Timer')
+    dialog.add_button('Cancel', 0)
+    dialog.add_button('Delete', 1)
+    
+    text = Gtk.Label.new(f"Are you sure you want to delete the\ntimer for \"{timerDict['name']}\"?")
+    dialog.setBody(text)
+    
+    def handleResponse(_dialog, code):
+      if code == 1:
+        # TODO: Stop the timer if it's currently running
+        del self.config['timers'][ndx]
+        self.saveConfig()
+        
+      _dialog.close()
+    
+    dialog.connect('response', handleResponse)
+    dialog.show_all()
+  
+  
   def handleTrayBtnRelease(self, icon, x, y, button, time, panel_position):
     match button:
       case 1: # left-click
@@ -101,6 +147,9 @@ class Application(Gtk.Application):
             editItem = Gtk.MenuItem.new_with_label('Edit')
             editItem.connect('activate', self.handleTimerEditClick, timerDict, ndx)
             subMenu.append(editItem)
+            deleteItem = Gtk.MenuItem.new_with_label('Delete')
+            deleteItem.connect('activate', self.handleTimerDeleteClick, timerDict, ndx)
+            subMenu.append(deleteItem)
             timerItem.set_submenu(subMenu)
             menu.append(timerItem)
           
@@ -150,13 +199,11 @@ class Application(Gtk.Application):
   
   
   def openTimerEditor(self, timerDict=None, timerNdx=None):
-    dialog = Gtk.Dialog()
-    dialog.set_icon_name('document-open-recent')
+    dialog = Dialog()
     title = 'Create a Timer' if timerDict is None else 'Edit Timer'
     dialog.set_title(title)
     
     grid = Gtk.Grid.new()
-    grid.set_name('timerEditorDialogContent')
     
     nameLabel = Gtk.Label.new('Timer Name:  ')
     nameInput = Gtk.Entry.new()
@@ -187,10 +234,7 @@ class Application(Gtk.Application):
     grid.attach(clrLabel, 0, 3, 1, 1)
     grid.attach(clrBtn, 1, 3, 1, 1)
     
-    dialogBody = dialog.get_content_area()
-    dialogBody.pack_start(grid, True, True, 0)
-    
-    dialog.get_action_area().set_layout(Gtk.ButtonBoxStyle.EXPAND)
+    dialog.setBody(grid)
     
     dialog.add_button('Cancel', 0)
     submitBtnLabel = 'Create' if timerDict is None else 'Update'
