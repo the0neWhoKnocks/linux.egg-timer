@@ -40,7 +40,7 @@ class Application(Gtk.Application):
   
   def saveConfig(self):
     with open(PATH__CONFIG_FILE, 'w') as file:
-      json.dump(self.config, file)
+      json.dump(self.config, file, sort_keys=True, indent=2)
   
   
   def do_activate(self):
@@ -110,14 +110,86 @@ class Application(Gtk.Application):
         self.statusIcon.popup_menu(menu, x-menuOffset, y, button, time, panel_position)
   
   
-  def createTimer():
-    print('create timer')
+  def saveTimer(self, name, hours, mins, color):
+    if 'timers' not in self.config:
+      self.config['timers'] = []
+    
+    colorTuple=eval(color.to_string().replace('rgb', ''))
+    colorHex = '#{:02x}{:02x}{:02x}'.format(*colorTuple)
+    
+    self.config['timers'].append({
+      'color': colorHex,
+      'hours': int(hours),
+      'mins': int(mins),
+      'name': name
+    })
+    
+    self.saveConfig()
+  
+  
+  def createTimer(self, *args):
+    dialog = Gtk.Dialog()
+    dialog.set_icon_name('document-open-recent')
+    dialog.set_title('Create a Timer')
+    
+    grid = Gtk.Grid.new()
+    grid.set_name('createTimerDialogContent')
+    
+    nameLabel = Gtk.Label.new('Timer Name:  ')
+    nameInput = Gtk.Entry.new()
+    grid.attach(nameLabel, 0, 0, 1, 1)
+    grid.attach(nameInput, 1, 0, 1, 1)
+    
+    hrsLabel = Gtk.Label.new('Hours:  ')
+    hrsLabel.set_xalign(1)
+    hrsInput = Gtk.SpinButton.new_with_range(0, 23, 1)
+    grid.attach(hrsLabel, 0, 1, 1, 1)
+    grid.attach(hrsInput, 1, 1, 1, 1)
+    
+    minsLabel = Gtk.Label.new('Minutes:  ')
+    minsLabel.set_xalign(1)
+    minsInput = Gtk.SpinButton.new_with_range(0, 59, 1)
+    grid.attach(minsLabel, 0, 2, 1, 1)
+    grid.attach(minsInput, 1, 2, 1, 1)
+    
+    clrLabel = Gtk.Label.new('Color:  ')
+    clrLabel.set_xalign(1)
+    defaultColor = Gdk.RGBA()
+    defaultColor.parse('#00C487')
+    clrBtn = Gtk.ColorButton.new_with_rgba(defaultColor)
+    grid.attach(clrLabel, 0, 3, 1, 1)
+    grid.attach(clrBtn, 1, 3, 1, 1)
+    
+    dialogBody = dialog.get_content_area()
+    dialogBody.pack_start(grid, True, True, 0)
+    
+    dialog.get_action_area().set_layout(Gtk.ButtonBoxStyle.EXPAND)
+    
+    dialog.add_button('Cancel', 0)
+    dialog.add_button('Create', 1)
+    
+    def handleCreateDialogResponse(_dialog, code):
+      match code:
+        case 1:
+          self.saveTimer(
+            nameInput.get_text(),
+            hrsInput.get_value(),
+            minsInput.get_value(),
+            clrBtn.get_rgba()
+          )
+      _dialog.close()
+    
+    dialog.connect('response', handleCreateDialogResponse)
+    
+    dialog.show_all()
+  
   
   def quitApp(self, *args):
     # TODO: kill any running timers
     # for timer in self.timers:
     #   timer.destroy()
     self.quit()
+
 
 if __name__ == '__main__':
   eggTimer = Application()
