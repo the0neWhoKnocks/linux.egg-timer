@@ -1,15 +1,28 @@
 #!/usr/bin/python3
 
 import json
+import logging
 import os
 import pathlib
+import subprocess
 import sys
+import threading
+import time
 
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
 gi.require_version('XApp', '1.0')
 from gi.repository import Gdk, Gio, GLib, Gtk, XApp
+
+
+logging.basicConfig(
+  format = '[%(name)s][%(levelname)s] %(message)s',
+  level = logging.INFO
+)
+log = logging.getLogger('eggtimer')
+log.setLevel(logging.INFO)
+
 
 APPLICATION_ID = 'com.nox.eggtimer'
 DIR_NAME = os.path.dirname(__file__)
@@ -38,6 +51,7 @@ class Dialog(Gtk.Dialog):
     # but it also outputs a deprecation warning, so doing this for now.
     self.action_area.set_layout(Gtk.ButtonBoxStyle.EXPAND)
   
+  
   def setBody(self, content):
     self.body.pack_start(content, True, True, 0)
 
@@ -49,7 +63,11 @@ class Application(Gtk.Application):
       application_id=APPLICATION_ID,
       flags=Gio.ApplicationFlags.FLAGS_NONE,
     )
+    self.completedTimers = {}
+    self.playingSound = False
     self.statusIcon = None
+    self.runningTimers = {}
+    self.timersRunning = False
   
   
   def loadConfig(self):
@@ -97,8 +115,76 @@ class Application(Gtk.Application):
     self.statusIcon.connect('button-release-event', self.handleTrayBtnRelease)
   
   
+  def playSound(self):
+    self.playingSound = True
+    
+    def play():
+      while len(self.completedTimers):
+        subprocess.run(f"aplay --quiet --nonblock {DIR_NAME}/complete.wav", shell=True, check=True)
+        time.sleep(2)
+      
+      self.playingSound = False
+      log.info('Sound stopped')
+    
+    thread = threading.Thread(daemon=True, target=play)
+    thread.start()
+  
+  
+  def notifyUser(self, timerName):
+    timestamp = time.strftime("%I:%M", time.localtime())
+    msg = f"Timer \\\"{timerName}\\\" completed at {timestamp}"
+    subprocess.run(f"notify-send --urgency=critical --expire-time=0 --app-name=\"Egg Timer\" --icon={ICON_NAME} \"{msg}\"", shell=True, check=True)
+    
+    self.completedTimers[timerName] = True
+    
+    if not self.playingSound: self.playSound()
+  
+  
+  def runTimers(self):
+    def tick():
+      time.sleep(1)
+      
+      completedTimers = []
+      
+      for timerName in self.runningTimers:
+        timer = self.runningTimers[timerName]
+        timer[1] += 1
+        
+        if timer[0] == timer[1]:
+          log.info(f"Timer \"{timerName}\" has finished")
+          completedTimers.append(timerName)
+        else:
+          log.info(f"{timerName}: {timer[0]} | {timer[1]}")
+      
+      # since dict's can't have items removed within a for loop
+      if len(completedTimers):
+        for timerName in completedTimers:
+          del self.runningTimers[timerName]
+          self.notifyUser(timerName)
+      
+      if len(self.runningTimers):
+        tick()
+      else:
+        log.info('All timers have finished')
+        self.timersRunning = False
+    
+    
+    if self.timersRunning != True:
+      self.timersRunning = True
+      thread = threading.Thread(daemon=True, target=tick)
+      thread.start()
+      log.info('Timers Started')
+  
+  
   def handleTimerStartClick(self, menuItem, timerDict):
-    print('start', timerDict)
+    totalSecs = ((timerDict['hours'] * 60) + timerDict['mins']) * 60
+    self.runningTimers[ timerDict['name'] ] = [totalSecs, 0]
+    self.runTimers()
+  
+  
+  def handleTimerStopClick(self, menuItem, timerName):
+    if timerName in self.runningTimers: del self.runningTimers[timerName]
+    elif timerName in self.completedTimers: del self.completedTimers[timerName]
   
   
   def handleTimerEditClick(self, menuItem, timerDict, ndx):
@@ -114,12 +200,13 @@ class Application(Gtk.Application):
     dialog.add_button('Cancel', 0)
     dialog.add_button('Delete', 1)
     
-    text = Gtk.Label.new(f"Are you sure you want to delete the\ntimer for \"{timerDict['name']}\"?")
+    timerName = timerDict['name']
+    text = Gtk.Label.new(f"Are you sure you want to delete the\ntimer for \"{timerName}\"?")
     dialog.setBody(text)
     
     def handleResponse(_dialog, code):
       if code == 1:
-        # TODO: Stop the timer if it's currently running
+        self.handleTimerStopClick(None, timerName)
         del self.config['timers'][ndx]
         self.saveConfig()
         
@@ -139,17 +226,28 @@ class Application(Gtk.Application):
         
         if self.config['timers']:
           for ndx, timerDict in enumerate(self.config['timers']):
-            timerItem = Gtk.MenuItem.new_with_label(f"[ {timerDict['name']} ] ( {str(timerDict['hours']).rjust(2, '0')}:{str(timerDict['mins']).rjust(2, '0')} )")
+            timerName = timerDict['name']
+            
+            timerItem = Gtk.MenuItem.new_with_label(f"[ {timerName} ] ( {str(timerDict['hours']).rjust(2, '0')}:{str(timerDict['mins']).rjust(2, '0')} )")
             subMenu = Gtk.Menu.new()
-            startItem = Gtk.MenuItem.new_with_label('Start')
-            startItem.connect('activate', self.handleTimerStartClick, timerDict)
-            subMenu.append(startItem)
+            
+            if timerName in self.runningTimers or timerName in self.completedTimers:
+              stopItem = Gtk.MenuItem.new_with_label('Stop')
+              stopItem.connect('activate', self.handleTimerStopClick, timerName)
+              subMenu.append(stopItem)
+            else:
+              startItem = Gtk.MenuItem.new_with_label('Start')
+              startItem.connect('activate', self.handleTimerStartClick, timerDict)
+              subMenu.append(startItem)
+            
             editItem = Gtk.MenuItem.new_with_label('Edit')
             editItem.connect('activate', self.handleTimerEditClick, timerDict, ndx)
             subMenu.append(editItem)
+            
             deleteItem = Gtk.MenuItem.new_with_label('Delete')
             deleteItem.connect('activate', self.handleTimerDeleteClick, timerDict, ndx)
             subMenu.append(deleteItem)
+            
             timerItem.set_submenu(subMenu)
             menu.append(timerItem)
           
