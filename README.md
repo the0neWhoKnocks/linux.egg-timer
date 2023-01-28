@@ -2,6 +2,12 @@
 
 An Egg-Timer App
 
+- [Development](#development)
+  - [Gtk Inspector](#gtk-inspector)
+  - [Sound Creation](#sound-creation)
+  - [Thread Check](#thread-check)
+- [Sources](#sources)
+
 ---
 
 ## Development
@@ -11,6 +17,21 @@ Just run:
 ./dist/app.py
 ```
 If it shows up in your Panel, success!
+
+
+### Gtk Inspector
+
+To view Gtk component hiearchies and style classes/names, you'll need the `GtkInspector`.
+
+```sh
+# If `libgtk-3-dev` isn't installed, do so
+sudo apt install libgtk-3-dev
+
+# Enable with
+gsettings set org.gtk.Settings.Debug enable-inspector-keybinding true
+```
+
+With an App/Window focused, hit `CTRL+SHIFT+I` and it should open with that App's items listed in the Objects view. Click on the lightbulb icon to `Show Details`, then click the drop-down and select `CSS nodes`.
 
 
 ### Sound Creation
