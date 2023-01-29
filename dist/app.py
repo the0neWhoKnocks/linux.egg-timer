@@ -37,8 +37,6 @@ PATH__CONFIG_FILE = os.path.join(PATH__CONFIG_DIR, 'config.json');
 class Dialog(Gtk.Dialog):
   def __init__(self):
     super(Dialog, self).__init__()
-    styleCtx = self.get_style_context()
-    Gtk.StyleContext.add_class(styleCtx, 'eggtimer-dialog')
     self.set_icon_name(ICON_NAME)
     
     # add a styling class to the body
@@ -46,7 +44,7 @@ class Dialog(Gtk.Dialog):
     self.body = Gtk.Box.new(Gtk.Orientation.VERTICAL, 10)
     contentArea.pack_start(self.body, True, True, 0)
     styleCtx = self.body.get_style_context()
-    Gtk.StyleContext.add_class(styleCtx, 'eggtimer-dialog__body')
+    styleCtx.add_class('eggtimer-dialog__body')
     
     # make the buttons stretch to fill available area.
     # NOTE: There's the `get_action_area` method which gets the same element,
@@ -159,7 +157,7 @@ class Application(Gtk.Application):
           completedTimers.append(timerName)
         else:
           log.info(f"{timerName}: {timer[0]} | {timer[1]}")
-          if self.timersMenuOpen == True and len(timer) == 3:
+          if self.timersMenuOpen == True and 'display' in timer[2]:
             self.setTimerText(timer)
       
       # since dict's can't have items removed within a for loop
@@ -190,7 +188,7 @@ class Application(Gtk.Application):
   
   def handleTimerStartClick(self, menuItem, timerDict):
     totalSecs = ((timerDict['hours'] * 60) + timerDict['mins']) * 60
-    self.runningTimers[ timerDict['name'] ] = [totalSecs, 0]
+    self.runningTimers[ timerDict['name'] ] = [totalSecs, 0, { 'color': timerDict['color'] }]
     self.runTimers()
   
   
@@ -241,7 +239,7 @@ class Application(Gtk.Application):
   
   def setTimerText(self, timer):
     remainingSecs = timer[0] - timer[1]
-    timer[2]['label'].set_text( str(timedelta(seconds=remainingSecs)) )
+    timer[2]['display']['label'].set_text( str(timedelta(seconds=remainingSecs)) )
   
   
   def handleTimersMenuClose(self, menu):
@@ -261,21 +259,31 @@ class Application(Gtk.Application):
         runningCount = len(self.runningTimers)
         if runningCount:
           for ndx, timerName in enumerate(self.runningTimers):
-            item = Gtk.MenuItem.new()
-            box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-            item.add(box)
+            timer = self.runningTimers[timerName]
             
-            # TODO: add timer color
+            item = Gtk.MenuItem.new()
+            grid = Gtk.Grid.new()
+            item.add(grid)
+            
+            cssItemName = f"timer_{ndx}"
+            colorBox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+            cssProvider = Gtk.CssProvider.new()
+            css = f".for--{cssItemName} {{ background-color: {timer[2]['color']}; }}"
+            cssProvider.load_from_data(bytes(css.encode()))
+            ctx = colorBox.get_style_context()
+            ctx.add_class('eggtimer-menuitem-color')
+            ctx.add_class(f"for--{cssItemName}")
+            ctx.add_provider(cssProvider, 601)
+            grid.attach(colorBox, 0, 0, 1, 2)
             
             nameLabel = Gtk.Label.new(timerName)
             self.setFont(nameLabel, family = 'Ubuntu Mono', size = 14, weight = Pango.Weight.BOLD)
-            box.pack_start(nameLabel, False, False, 0)
+            grid.attach(nameLabel, 1, 0, 1, 1)
             
             timeLabel = Gtk.Label.new('00:00:00')
             self.setFont(timeLabel, family = 'Ubuntu Mono', size = 24)
-            box.pack_start(timeLabel, False, False, 0)
-            timer = self.runningTimers[timerName]
-            timer.insert(2, { 'label': timeLabel })
+            grid.attach(timeLabel, 1, 1, 1, 1)
+            timer[2]['display'] = { 'label': timeLabel }
             self.setTimerText(timer)
             
             # TODO: click on item stops the timer
