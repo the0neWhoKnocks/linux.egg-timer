@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+from datetime import timedelta
 import json
 import logging
 import os
@@ -12,8 +13,9 @@ import time
 import gi
 gi.require_version('Gdk', '3.0')
 gi.require_version('Gtk', '3.0')
+gi.require_version('PangoCairo', '1.0')
 gi.require_version('XApp', '1.0')
-from gi.repository import Gdk, Gio, GLib, Gtk, XApp
+from gi.repository import Gdk, Gio, GLib, Gtk, Pango, XApp
 
 
 logging.basicConfig(
@@ -21,7 +23,7 @@ logging.basicConfig(
   level = logging.INFO
 )
 log = logging.getLogger('eggtimer')
-log.setLevel(logging.INFO)
+log.setLevel(logging.INFO) # TODO: comment out when done, maybe figure out CLI flag to pass to enable instead
 
 
 APPLICATION_ID = 'com.nox.eggtimer'
@@ -67,6 +69,8 @@ class Application(Gtk.Application):
     self.playingSound = False
     self.statusIcon = None
     self.runningTimers = {}
+    self.runningTimersMenu = None
+    self.timersMenuOpen = False
     self.timersRunning = False
   
   
@@ -155,9 +159,16 @@ class Application(Gtk.Application):
           completedTimers.append(timerName)
         else:
           log.info(f"{timerName}: {timer[0]} | {timer[1]}")
+          if self.timersMenuOpen == True and len(timer) == 3:
+            self.setTimerText(timer)
       
       # since dict's can't have items removed within a for loop
       if len(completedTimers):
+        # NOTE: I tried removing menu items after completion, but doing that
+        # caused the system to lock up.
+        if self.timersMenuOpen == True:
+          self.runningTimersMenu.deactivate()
+        
         for timerName in completedTimers:
           del self.runningTimers[timerName]
           self.notifyUser(timerName)
@@ -166,6 +177,7 @@ class Application(Gtk.Application):
         tick()
       else:
         log.info('All timers have finished')
+        self.runningTimersMenu = None
         self.timersRunning = False
     
     
@@ -216,13 +228,70 @@ class Application(Gtk.Application):
     dialog.show_all()
   
   
+  def setFont(self, lbl, family = None, size = None, weight = None):
+    fd = Pango.FontDescription.new()
+    if family is not None: fd.set_family(family)
+    if size is not None: fd.set_size(Pango.SCALE * size)
+    if weight is not None: fd.set_weight(weight)
+    font = Pango.AttrFontDesc.new(fd)
+    attrs = Pango.AttrList.new()
+    attrs.insert(font)
+    lbl.set_attributes(attrs)
+  
+  
+  def setTimerText(self, timer):
+    remainingSecs = timer[0] - timer[1]
+    timer[2]['label'].set_text( str(timedelta(seconds=remainingSecs)) )
+  
+  
+  def handleTimersMenuClose(self, menu):
+    self.timersMenuOpen = False
+    
+    for timerName in self.runningTimers:
+      timer = self.runningTimers[timerName]
+      del timer[2]
+  
+  
   def handleTrayBtnRelease(self, icon, x, y, button, time, panel_position):
     match button:
       case 1: # left-click
-        print('open timers')
+        self.runningTimersMenu = Gtk.Menu.new()
+        self.runningTimersMenu.set_reserve_toggle_size(False)
+        
+        runningCount = len(self.runningTimers)
+        if runningCount:
+          for ndx, timerName in enumerate(self.runningTimers):
+            item = Gtk.MenuItem.new()
+            box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+            item.add(box)
+            
+            # TODO: add timer color
+            
+            nameLabel = Gtk.Label.new(timerName)
+            self.setFont(nameLabel, family = 'Ubuntu Mono', size = 14, weight = Pango.Weight.BOLD)
+            box.pack_start(nameLabel, False, False, 0)
+            
+            timeLabel = Gtk.Label.new('00:00:00')
+            self.setFont(timeLabel, family = 'Ubuntu Mono', size = 24)
+            box.pack_start(timeLabel, False, False, 0)
+            timer = self.runningTimers[timerName]
+            timer.insert(2, { 'label': timeLabel })
+            self.setTimerText(timer)
+            
+            # TODO: click on item stops the timer
+            
+            self.runningTimersMenu.append(item)
+            if runningCount > 1 and (ndx + 1) < runningCount:
+              self.runningTimersMenu.append(Gtk.SeparatorMenuItem.new())
+        
+          self.runningTimersMenu.show_all()
+          self.runningTimersMenu.connect('deactivate', self.handleTimersMenuClose)
+          self.statusIcon.popup_menu(self.runningTimersMenu, x, y, button, time, panel_position)
+          self.timersMenuOpen = True
         
       case 3: # right-click
         menu = Gtk.Menu.new()
+        menu.set_reserve_toggle_size(False)
         
         if self.config['timers']:
           for ndx, timerDict in enumerate(self.config['timers']):
