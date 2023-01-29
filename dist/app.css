@@ -1,3 +1,9 @@
 .eggtimer-dialog__body {
   padding: 10px;
 }
+
+.eggtimer-menuitem-color {
+  padding: 5px;
+  margin-right: 5px;
+  background-color: #CCCCCC;
+}
