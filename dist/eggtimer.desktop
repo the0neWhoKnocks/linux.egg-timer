@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Egg Timer
+Comment=App to set multiple timers
+Exec=bash -c "$HOME/.local/bin/eggtimer"
+Icon=eggtimer-on-symbolic
+Terminal=false
+Type=Application
+Categories=Utility;Application;
