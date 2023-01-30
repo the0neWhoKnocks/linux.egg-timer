@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="18"
+   height="18"
+   version="1.1"
+   viewBox="0 0 4.7625 4.7625"
+   id="svg831"
+   sodipodi:docname="eggtimer-off-symbolic.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   inkscape:export-filename="/home/nox/Projects/Code/Apps/linux.egg-timer/dist/icons/eggtimer-off-symbolic.png"
+   inkscape:export-xdpi="2730.6667"
+   inkscape:export-ydpi="2730.6667"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs835">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect1871"
+       is_visible="true"
+       lpeversion="1"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview833"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="28.244988"
+     inkscape:cx="1.522394"
+     inkscape:cy="11.488764"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="434"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g2749" />
+  <g
+     inkscape:groupmode="layer"
+     id="g2749"
+     inkscape:label="timer-off"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <path
+       style="color:#000000;fill:#7f7f7f;fill-opacity:1;stroke-width:1;-inkscape-stroke:none"
+       d="m 2.3807658,0.02466891 c -0.2822909,0 -0.5402776,0.13196973 -0.7629237,0.32820931 C 1.395196,0.54911782 1.2027299,0.81184871 1.0418457,1.1027605 0.72007712,1.6845839 0.52236199,2.372491 0.52236199,2.8850893 c 0,1.0251963 0.83320751,1.8605773 1.85840381,1.8605773 1.0251964,0 1.8605774,-0.835381 1.8605774,-1.8605773 0,-0.5125983 -0.1998887,-1.2005054 -0.5216572,-1.7823288 C 3.5588016,0.81184871 3.3685091,0.54911782 3.145863,0.35287822 2.923217,0.15663864 2.6630566,0.02466891 2.3807658,0.02466891 Z m 0,0.29560574 c 0.1905247,0 0.3824282,0.0894447 0.5694757,0.25430788 0.1870476,0.16486316 0.3639969,0.40227253 0.5129629,0.67163367 0.2979321,0.5387224 0.482533,1.2058401 0.482533,1.6388731 0,0.866066 -0.6989056,1.5649716 -1.5649716,1.5649716 -0.866066,0 -1.56497164,-0.6989056 -1.56497163,-1.5649716 C 0.81579416,2.4520563 1.000395,1.7849386 1.2983271,1.2462162 1.4472931,0.97685506 1.6242424,0.73944569 1.81129,0.57458253 1.9983375,0.40971939 2.190241,0.32027465 2.3807658,0.32027465 Z"
+       id="path2743" />
+    <path
+       style="color:#000000;fill:#7f7f7f;fill-opacity:1;stroke-width:1;-inkscape-stroke:none"
+       d="m 2.3807658,1.6831042 c -0.6631232,0 -1.2041588,0.5388619 -1.2041588,1.2019851 0,0.6631232 0.5410356,1.2041586 1.2041588,1.2041587 0.6631232,0 1.2041587,-0.5410355 1.2041587,-1.2041587 0,-0.6631232 -0.5410355,-1.2019851 -1.2041587,-1.2019851 z m 0,0.2934322 c 0.5039929,0 0.9107265,0.40456 0.9107266,0.9085529 0,0.5039928 -0.4067337,0.9107265 -0.9107266,0.9107265 -0.5039929,0 -0.908553,-0.4067337 -0.908553,-0.9107265 0,-0.5039929 0.4045601,-0.908553 0.908553,-0.9085529 z"
+       id="circle2745" />
+    <path
+       style="color:#000000;fill:#7f7f7f;fill-opacity:1;stroke-width:1;stroke-linecap:round;-inkscape-stroke:none"
+       d="M 2.369898,2.1308599 A 0.14722307,0.14722307 0 0 0 2.2220951,2.2764892 l -0.00217,0.725973 0.5194837,0.33473 A 0.14722307,0.14722307 0 0 0 2.9437209,3.2915472 0.14722307,0.14722307 0 0 0 2.8980758,3.0894051 L 2.5155272,2.8416178 V 2.2786627 A 0.14722307,0.14722307 0 0 0 2.369898,2.1308599 Z"
+       id="path2747" />
+  </g>
+</svg>
