@@ -2,11 +2,23 @@
 
 An Egg-Timer App
 
+- [Install](#install)
 - [Development](#development)
   - [Gtk Inspector](#gtk-inspector)
   - [Sound Creation](#sound-creation)
   - [Thread Check](#thread-check)
 - [Sources](#sources)
+
+---
+
+## Install
+
+Run:
+```sh
+./install.sh
+```
+
+If the egg icon doesn't appear in the panel, run `tail -f ~/.xsession-errors` to see if there were any errors.
 
 ---
 
