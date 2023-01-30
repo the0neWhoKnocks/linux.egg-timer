@@ -1,9 +1,36 @@
+@keyframes blink {
+  0% { opacity: 1; }
+  100% { opacity: 0.25; }
+}
+
 .eggtimer-dialog__body {
   padding: 10px;
 }
 
-.eggtimer-menuitem-color {
+.eggtimer-running-timer.has--sep {
+  border-top: solid 1px;
+}
+
+.eggtimer-running-timer.done {
+  animation-name: blink;
+  animation-duration: 2s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.eggtimer-running-timer__color {
   padding: 5px;
   margin-right: 5px;
   background-color: #CCCCCC;
+}
+
+.eggtimer-running-timer__name-label,
+.eggtimer-running-timer__time-label {
+  padding: 5px 10px;
+}
+.eggtimer-running-timer__name-label {
+  padding-bottom: 0;
+}
+.eggtimer-running-timer__time-label {
+  padding-top: 0;
 }
