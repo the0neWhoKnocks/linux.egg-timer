@@ -65,6 +65,9 @@ Python:
 - https://python-gtk-3-tutorial.readthedocs.io/en/latest/application.html#example
 - https://blog.devgenius.io/how-to-make-a-clock-with-python-7587e107bb5e
 
+Gdk:
+- https://docs.gtk.org/gdk3/index.html#classes
+
 Gtk:
 - https://docs.gtk.org/gtk3/#classes
 - https://docs.gtk.org/gtk3/css-properties.html
