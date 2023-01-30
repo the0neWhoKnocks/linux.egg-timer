@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 
 from datetime import timedelta
+import argparse
 import json
 import logging
 import os
 import pathlib
 import subprocess
-import sys
 import threading
 import time
 
@@ -18,12 +18,24 @@ gi.require_version('XApp', '1.0')
 from gi.repository import Gdk, Gio, GLib, Gtk, Pango, XApp
 
 
+parser = argparse.ArgumentParser(
+  prog = 'Egg Timer',
+  description = 'An App to create and run multiple timers.',
+)
+parser.add_argument(
+  '-l',
+  '--loglevel',
+  default='warning',
+  help='Provide logging level. Example: --loglevel debug'
+)
+args = parser.parse_args()
+
+
 logging.basicConfig(
   format = '[%(name)s][%(levelname)s] %(message)s',
-  level = logging.INFO
+  level = args.loglevel.upper()
 )
 log = logging.getLogger('eggtimer')
-log.setLevel(logging.INFO) # TODO: comment out when done, maybe figure out CLI flag to pass to enable instead
 
 
 APPLICATION_ID = 'com.nox.eggtimer'
@@ -465,4 +477,4 @@ class Application(Gtk.Application):
 
 if __name__ == '__main__':
   eggTimer = Application()
-  eggTimer.run(sys.argv)
+  eggTimer.run()
