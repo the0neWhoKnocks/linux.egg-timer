@@ -12,11 +12,11 @@ An Egg-Timer App
 
 ## Development
 
-Just run:
+Run:
 ```sh
-./dist/app.py
+./dist/app.py --logging=info
 ```
-If it shows up in your Panel, success!
+If it shows up in your Panel, success! Otherwise run `tail -f ~/.xsession-errors` to see if there were any errors.
 
 
 ### Gtk Inspector
