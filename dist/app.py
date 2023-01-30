@@ -28,7 +28,9 @@ log.setLevel(logging.INFO) # TODO: comment out when done, maybe figure out CLI f
 
 APPLICATION_ID = 'com.nox.eggtimer'
 DIR_NAME = os.path.dirname(__file__)
-ICON_NAME = 'document-open-recent'
+ICON__EXTERNAL = 'eggtimer-on-symbolic'
+ICON__TRAY_ON = 'eggtimer-on-symbolic'
+ICON__TRAY_OFF = 'eggtimer-off-symbolic'
 MODIFIER__TIMER_DONE = 'done'
 STYLE_SHEET_PATH = os.path.join(DIR_NAME, 'app.css')
 PATH__CONFIG_DIR = os.path.join(GLib.get_user_config_dir(), 'eggtimer')
@@ -38,7 +40,7 @@ PATH__CONFIG_FILE = os.path.join(PATH__CONFIG_DIR, 'config.json');
 class Dialog(Gtk.Dialog):
   def __init__(self):
     super(Dialog, self).__init__()
-    self.set_icon_name(ICON_NAME)
+    self.set_icon_name(ICON__EXTERNAL)
     
     # add a styling class to the body
     contentArea = self.get_content_area()
@@ -107,7 +109,7 @@ class Application(Gtk.Application):
   
   def createStatusIcon(self):
     self.statusIcon = XApp.StatusIcon()
-    self.statusIcon.set_icon_name(ICON_NAME)
+    self.statusIcon.set_icon_name(ICON__TRAY_OFF)
     self.statusIcon.set_visible(True)
     self.statusIcon.connect('button-release-event', self.handleTrayBtnRelease)
   
@@ -130,7 +132,7 @@ class Application(Gtk.Application):
   def notifyUser(self, timerName):
     timestamp = time.strftime("%I:%M", time.localtime())
     msg = f"Timer \\\"{timerName}\\\" completed at {timestamp}"
-    subprocess.run(f"notify-send -t 3000 --hint=\"int:transient:1\" --app-name=\"Egg Timer\" --icon={ICON_NAME} \"{msg}\"", shell=True, check=True)
+    subprocess.run(f"notify-send -t 3000 --hint=\"int:transient:1\" --app-name=\"Egg Timer\" --icon={ICON__EXTERNAL} \"{msg}\"", shell=True, check=True)
     
     self.completedTimers[timerName] = True
     
@@ -175,6 +177,7 @@ class Application(Gtk.Application):
     
     if self.timersRunning != True:
       self.timersRunning = True
+      self.statusIcon.set_icon_name(ICON__TRAY_ON)
       thread = threading.Thread(daemon=True, target=tick)
       thread.start()
       log.info('Timers Started')
@@ -192,6 +195,9 @@ class Application(Gtk.Application):
     
     if self.timersMenuOpen == True:
       self.runningTimersMenu.deactivate()
+    
+    if len(self.runningTimers) == 0:
+      self.statusIcon.set_icon_name(ICON__TRAY_OFF)
   
   
   def handleTimerEditClick(self, menuItem, timerDict, ndx):
