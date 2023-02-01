@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 from datetime import timedelta
 import argparse
@@ -264,123 +264,122 @@ class Application(Gtk.Application):
   def handleTrayBtnRelease(self, icon, x, y, button, time, panel_position):
     iconWidth = 20 # this is just a guess
     
-    match button:
-      case 1: # left-click
-        self.runningTimersMenu = Gtk.Menu.new()
-        self.runningTimersMenu.set_reserve_toggle_size(False)
-        
-        runningCount = len(self.runningTimers)
-        if runningCount:
-          for ndx, timerName in enumerate(self.runningTimers):
-            timer = self.runningTimers[timerName]
-            
-            item = Gtk.MenuItem.new()
-            ctx = item.get_style_context()
-            ctx.add_class('eggtimer-running-timer')
-            if timer[0] == timer[1]: ctx.add_class(MODIFIER__TIMER_DONE)
-            
-            grid = Gtk.Grid.new()
-            item.add(grid)
-            
-            if ndx > 0: ctx.add_class('has--sep')
-            
-            cssItemName = f"timer_{ndx}"
-            colorBox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
-            cssProvider = Gtk.CssProvider.new()
-            css = f".for--{cssItemName} {{ background-color: {timer[2]['color']}; }}"
-            cssProvider.load_from_data(bytes(css.encode()))
-            ctx = colorBox.get_style_context()
-            ctx.add_class('eggtimer-running-timer__color')
-            ctx.add_class(f"for--{cssItemName}")
-            ctx.add_provider(cssProvider, 601)
-            grid.attach(colorBox, 0, 0, 1, 2)
-            
-            nameLabel = Gtk.Label.new(timerName)
-            ctx = nameLabel.get_style_context()
-            ctx.add_class('eggtimer-running-timer__name-label')
-            self.setFont(nameLabel, family = 'Ubuntu Mono', size = 14, weight = Pango.Weight.BOLD)
-            grid.attach(nameLabel, 1, 0, 1, 1)
-            
-            timeLabel = Gtk.Label.new('00:00:00')
-            timeLabel.set_hexpand(True)
-            timeLabel.set_halign(Gtk.Align.CENTER)
-            ctx = timeLabel.get_style_context()
-            ctx.add_class('eggtimer-running-timer__time-label')
-            self.setFont(timeLabel, family = 'Ubuntu Mono', size = 24)
-            grid.attach(timeLabel, 1, 0 + 1, 1, 1)
-            timer[2]['display'] = { 'label': timeLabel, 'menuItem': item }
-            self.setTimerText(timer)
-            
-            item.connect('activate', self.handleTimerStopClick, timerName)
-            item.set_tooltip_text('Click to Stop Timer')
-            
-            self.runningTimersMenu.append(item)
-        
-          self.runningTimersMenu.show_all()
-          self.runningTimersMenu.connect('deactivate', self.handleTimersMenuClose)
+    if button == 1: # left-click
+      self.runningTimersMenu = Gtk.Menu.new()
+      self.runningTimersMenu.set_reserve_toggle_size(False)
+      
+      runningCount = len(self.runningTimers)
+      if runningCount:
+        for ndx, timerName in enumerate(self.runningTimers):
+          timer = self.runningTimers[timerName]
           
-          self.statusIcon.popup_menu(self.runningTimersMenu, x, y, button, time, panel_position)
-          menuOffset = 0
-          if panel_position == Gtk.PositionType.BOTTOM or panel_position == Gtk.PositionType.TOP:
-            # can't center a menu without first displaying it
-            menuWidth = self.runningTimersMenu.get_allocated_width()
-            menuOffset = (menuWidth/2) - iconWidth
-            self.statusIcon.popup_menu(self.runningTimersMenu, x - menuOffset, y, button, time, panel_position)
+          item = Gtk.MenuItem.new()
+          ctx = item.get_style_context()
+          ctx.add_class('eggtimer-running-timer')
+          if timer[0] == timer[1]: ctx.add_class(MODIFIER__TIMER_DONE)
           
-          self.timersMenuOpen = True
-        
-      case 3: # right-click
-        menu = Gtk.Menu.new()
-        menu.set_reserve_toggle_size(False)
-        
-        if self.config['timers']:
-          for ndx, timerDict in enumerate(self.config['timers']):
-            timerName = timerDict['name']
-            
-            timerItem = Gtk.MenuItem.new_with_label(f"{str(timerDict['hours']).rjust(2, '0')}:{str(timerDict['mins']).rjust(2, '0')} | {timerName}")
-            subMenu = Gtk.Menu.new()
-            
-            if timerName in self.runningTimers or timerName in self.completedTimers:
-              stopItem = Gtk.MenuItem.new_with_label('Stop')
-              stopItem.connect('activate', self.handleTimerStopClick, timerName)
-              subMenu.append(stopItem)
-            else:
-              startItem = Gtk.MenuItem.new_with_label('Start')
-              startItem.connect('activate', self.handleTimerStartClick, timerDict)
-              subMenu.append(startItem)
-            
-            editItem = Gtk.MenuItem.new_with_label('Edit')
-            editItem.connect('activate', self.handleTimerEditClick, timerDict, ndx)
-            subMenu.append(editItem)
-            
-            deleteItem = Gtk.MenuItem.new_with_label('Delete')
-            deleteItem.connect('activate', self.handleTimerDeleteClick, timerDict, ndx)
-            subMenu.append(deleteItem)
-            
-            timerItem.set_submenu(subMenu)
-            menu.append(timerItem)
+          grid = Gtk.Grid.new()
+          item.add(grid)
           
-          menu.append(Gtk.SeparatorMenuItem.new())
+          if ndx > 0: ctx.add_class('has--sep')
+          
+          cssItemName = f"timer_{ndx}"
+          colorBox = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
+          cssProvider = Gtk.CssProvider.new()
+          css = f".for--{cssItemName} {{ background-color: {timer[2]['color']}; }}"
+          cssProvider.load_from_data(bytes(css.encode()))
+          ctx = colorBox.get_style_context()
+          ctx.add_class('eggtimer-running-timer__color')
+          ctx.add_class(f"for--{cssItemName}")
+          ctx.add_provider(cssProvider, 601)
+          grid.attach(colorBox, 0, 0, 1, 2)
+          
+          nameLabel = Gtk.Label.new(timerName)
+          ctx = nameLabel.get_style_context()
+          ctx.add_class('eggtimer-running-timer__name-label')
+          self.setFont(nameLabel, family = 'Ubuntu Mono', size = 14, weight = Pango.Weight.BOLD)
+          grid.attach(nameLabel, 1, 0, 1, 1)
+          
+          timeLabel = Gtk.Label.new('00:00:00')
+          timeLabel.set_hexpand(True)
+          timeLabel.set_halign(Gtk.Align.CENTER)
+          ctx = timeLabel.get_style_context()
+          ctx.add_class('eggtimer-running-timer__time-label')
+          self.setFont(timeLabel, family = 'Ubuntu Mono', size = 24)
+          grid.attach(timeLabel, 1, 0 + 1, 1, 1)
+          timer[2]['display'] = { 'label': timeLabel, 'menuItem': item }
+          self.setTimerText(timer)
+          
+          item.connect('activate', self.handleTimerStopClick, timerName)
+          item.set_tooltip_text('Click to Stop Timer')
+          
+          self.runningTimersMenu.append(item)
+      
+        self.runningTimersMenu.show_all()
+        self.runningTimersMenu.connect('deactivate', self.handleTimersMenuClose)
         
-        item = Gtk.MenuItem.new_with_label('Create Timer')
-        item.connect('activate', self.createTimer)
-        menu.append(item)
-        
-        menu.append(Gtk.SeparatorMenuItem.new())
-        
-        item = Gtk.MenuItem.new_with_label('Quit')
-        item.connect('activate', self.quitApp)
-        menu.append(item)
-        
-        menu.show_all()
-        
-        self.statusIcon.popup_menu(menu, x, y, button, time, panel_position)
+        self.statusIcon.popup_menu(self.runningTimersMenu, x, y, button, time, panel_position)
         menuOffset = 0
         if panel_position == Gtk.PositionType.BOTTOM or panel_position == Gtk.PositionType.TOP:
           # can't center a menu without first displaying it
-          menuWidth = menu.get_allocated_width()
+          menuWidth = self.runningTimersMenu.get_allocated_width()
           menuOffset = (menuWidth/2) - iconWidth
-          self.statusIcon.popup_menu(menu, x - menuOffset, y, button, time, panel_position)
+          self.statusIcon.popup_menu(self.runningTimersMenu, x - menuOffset, y, button, time, panel_position)
+        
+        self.timersMenuOpen = True
+        
+    elif button == 3: # right-click
+      menu = Gtk.Menu.new()
+      menu.set_reserve_toggle_size(False)
+      
+      if 'timers' in self.config:
+        for ndx, timerDict in enumerate(self.config['timers']):
+          timerName = timerDict['name']
+          
+          timerItem = Gtk.MenuItem.new_with_label(f"{str(timerDict['hours']).rjust(2, '0')}:{str(timerDict['mins']).rjust(2, '0')} | {timerName}")
+          subMenu = Gtk.Menu.new()
+          
+          if timerName in self.runningTimers or timerName in self.completedTimers:
+            stopItem = Gtk.MenuItem.new_with_label('Stop')
+            stopItem.connect('activate', self.handleTimerStopClick, timerName)
+            subMenu.append(stopItem)
+          else:
+            startItem = Gtk.MenuItem.new_with_label('Start')
+            startItem.connect('activate', self.handleTimerStartClick, timerDict)
+            subMenu.append(startItem)
+          
+          editItem = Gtk.MenuItem.new_with_label('Edit')
+          editItem.connect('activate', self.handleTimerEditClick, timerDict, ndx)
+          subMenu.append(editItem)
+          
+          deleteItem = Gtk.MenuItem.new_with_label('Delete')
+          deleteItem.connect('activate', self.handleTimerDeleteClick, timerDict, ndx)
+          subMenu.append(deleteItem)
+          
+          timerItem.set_submenu(subMenu)
+          menu.append(timerItem)
+        
+        menu.append(Gtk.SeparatorMenuItem.new())
+      
+      item = Gtk.MenuItem.new_with_label('Create Timer')
+      item.connect('activate', self.createTimer)
+      menu.append(item)
+      
+      menu.append(Gtk.SeparatorMenuItem.new())
+      
+      item = Gtk.MenuItem.new_with_label('Quit')
+      item.connect('activate', self.quitApp)
+      menu.append(item)
+      
+      menu.show_all()
+      
+      self.statusIcon.popup_menu(menu, x, y, button, time, panel_position)
+      menuOffset = 0
+      if panel_position == Gtk.PositionType.BOTTOM or panel_position == Gtk.PositionType.TOP:
+        # can't center a menu without first displaying it
+        menuWidth = menu.get_allocated_width()
+        menuOffset = (menuWidth/2) - iconWidth
+        self.statusIcon.popup_menu(menu, x - menuOffset, y, button, time, panel_position)
   
   
   def saveTimer(self, name, hours, mins, color, timerNdx=None):
@@ -448,15 +447,15 @@ class Application(Gtk.Application):
     dialog.add_button(submitBtnLabel, 1)
     
     def handleCreateDialogResponse(_dialog, code):
-      match code:
-        case 1:
-          self.saveTimer(
-            nameInput.get_text(),
-            hrsInput.get_value(),
-            minsInput.get_value(),
-            clrBtn.get_rgba(),
-            timerNdx=timerNdx
-          )
+      if code == 1:
+        self.saveTimer(
+          nameInput.get_text(),
+          hrsInput.get_value(),
+          minsInput.get_value(),
+          clrBtn.get_rgba(),
+          timerNdx=timerNdx
+        )
+      
       _dialog.close()
     
     dialog.connect('response', handleCreateDialogResponse)
