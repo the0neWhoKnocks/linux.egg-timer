@@ -175,22 +175,27 @@ class Application(Gtk.Application):
       # since dict's can't have items removed within a for loop
       if len(completedTimers):
         for timerName in completedTimers:
-          menuItem = self.runningTimers[timerName][2]['display']['menuItem']
-          ctx = menuItem.get_style_context()
-          ctx.add_class(MODIFIER__TIMER_DONE)
+          if 'display' in self.runningTimers[timerName][2]:
+            menuItem = self.runningTimers[timerName][2]['display']['menuItem']
+            ctx = menuItem.get_style_context()
+            ctx.add_class(MODIFIER__TIMER_DONE)
+          
           self.notifyUser(timerName)
-      
-      if len(self.completedTimers) < len(self.runningTimers):
-        tick()
-      else:
-        log.info('All timers have finished')
-        self.timersRunning = False
+    
+    
+    def checkTimers():
+      while self.timersRunning:
+        if len(self.completedTimers) < len(self.runningTimers):
+          tick()
+        else:
+          log.info('All timers have finished')
+          self.timersRunning = False
     
     
     if self.timersRunning != True:
       self.timersRunning = True
       self.statusIcon.set_icon_name(ICON__TRAY_ON)
-      thread = threading.Thread(daemon=True, target=tick)
+      thread = threading.Thread(daemon=True, target=checkTimers)
       thread.start()
       log.info('Timers Started')
   
