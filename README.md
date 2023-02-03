@@ -26,7 +26,7 @@ If the egg icon doesn't appear in the panel, run `tail -f ~/.xsession-errors` to
 
 Run:
 ```sh
-./dist/app.py --logging=info
+./dist/app.py --loglevel=info
 ```
 If it shows up in your Panel, success! Otherwise run `tail -f ~/.xsession-errors` to see if there were any errors.
 
