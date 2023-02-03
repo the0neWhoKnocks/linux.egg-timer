@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # icons
-mkdir -p ~/.local/share/icons/hicolor/symbolic/apps
-cp ./dist/icons/*.svg ~/.local/share/icons/hicolor/symbolic/apps/
+mkdir -p ~/{.icons,.local/share/icons/hicolor/symbolic/apps}
+cp $(grep -L "symbolic" ./dist/icons/*.svg) ~/.icons/
+cp ./dist/icons/*symbolic.svg ~/.local/share/icons/hicolor/symbolic/apps/
 
 # binary
 mkdir -p ~/.local/bin
