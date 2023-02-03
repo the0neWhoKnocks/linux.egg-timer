@@ -40,7 +40,7 @@ log = logging.getLogger('eggtimer')
 
 APPLICATION_ID = 'com.nox.eggtimer'
 DIR_NAME = os.path.dirname(__file__)
-ICON__EXTERNAL = 'eggtimer-on-symbolic'
+ICON__EXTERNAL = 'eggtimer'
 ICON__TRAY_ON = 'eggtimer-on-symbolic'
 ICON__TRAY_OFF = 'eggtimer-off-symbolic'
 MODIFIER__TIMER_DONE = 'done'
