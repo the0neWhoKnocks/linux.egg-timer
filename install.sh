@@ -21,3 +21,6 @@ chmod +x $launcher
 if hash gio 2>/dev/null; then
   gio set -t string "$launcher" metadata::xfce-exe-checksum "$(sha256sum "$launcher" | awk '{print $1}')"
 fi
+
+# start the app
+gtk-launch eggtimer
