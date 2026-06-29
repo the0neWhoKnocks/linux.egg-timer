@@ -16,7 +16,9 @@ ignore = [
   "D100",    # undocumented-public-module
   "D101",    # undocumented-public-class
   "D102",    # undocumented-public-method
+  "D103",    # undocumented-public-function
   "D107",    # undocumented-public-init
+  "D202",    # blank-line-after-function
   "E501",    # line-too-long
   "ERA001",  # commented-out-code
   "PTH118",  # os-path-join
@@ -30,6 +32,7 @@ ignore = [
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = [
   "COM812",  # missing-trailing-comma
+  "I001",    # unsorted-imports
   "Q000"     # bad-quotes-inline-string
 ]
 unfixable = []

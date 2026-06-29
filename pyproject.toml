@@ -1,0 +1,16 @@
+[project]
+name = "linux-egg-timer"
+version = "1.0.0"
+description = "An Applet that allows for running multiple custom timers."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "argparse==1.4.0",
+    "logging==0.4.9.6",
+    "pathlib==1.0.1",
+    "timedelta==2020.12.3",
+    "ttkthemes==3.3.0",
+]
+
+[dependency-groups]
+dev = []
