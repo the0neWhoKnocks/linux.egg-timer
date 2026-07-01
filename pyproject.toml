@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "argparse==1.4.0",
+    "customtkinter==6.0.0",
     "logging==0.4.9.6",
     "pathlib==1.0.1",
     "timedelta==2020.12.3",

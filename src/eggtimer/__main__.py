@@ -3,6 +3,13 @@ import logging
 import tkinter as tk
 from tkinter import ttk
 
+import customtkinter
+from customtkinter import (
+  CTkButton,
+  CTkFont,
+  DrawEngine,
+  FontManager,
+)
 from ttkthemes import ThemedTk
 
 from eggtimer.widgets import (
@@ -31,14 +38,29 @@ logging.basicConfig(
 )
 
 
-class EggTimer(ThemedTk):
+# class EggTimer(ThemedTk):
+class EggTimer(customtkinter.CTk):
     def __init__(self) -> None:
-        super().__init__(theme="plastik")
+        # super().__init__(theme="plastik")
+        super().__init__()
         # print("Available themes:", self.get_themes())
         # Themes: adapta, alt, aquativo, arc, black, blue, breeze (KDE), clam, classic, clearlooks, default, elegance, equilux, itft1, keramik, kroc, plastik, radiance, scidblue, scidgreen, scidgrey, scidmint, scidpink, scidpurple, scidsand, smog, ubuntu, winxpblue, yaru (Ubuntu)
         self.title("Egg Timer")
         # self.geometry("400x300")  # Set the window size
-        self.build_ui()
+        # self.build_ui()
+        
+        print( tk.font.families() )
+        
+        # https://github.com/TomSchimansky/CustomTkinter/discussions/2156
+        # customtkinter.FontManager.load_font("./eggtimer/assets/FantasqueSansMNerdFontMono-Regular.ttf")
+        customtkinter.FontManager.load_font("/usr/share/fonts/truetype/FantasqueSansMNerdFontMono-Regular.ttf")
+        self.defaultFont = customtkinter.CTkFont(family="FantasqueSansM Nerd Font Mono", size=18)
+        self.configure(font=self.defaultFont)
+        # DrawEngine.preferred_drawing_method = "polygon_shapes"
+        # DrawEngine.preferred_drawing_method = "font_shapes"
+        DrawEngine.preferred_drawing_method = "circle_shapes"
+        button = CTkButton(self, text="My Button", font=("FantasqueSansM Nerd Font Mono", 24), command=lambda: print("click"))
+        button.pack(padx=20, pady=20)
     
     @staticmethod
     def add_timer_to_list(cp: ColorPickerBtn, input: ttk.Entry, timer: EditableTimer, list: TimersList) -> None:  # noqa: A002

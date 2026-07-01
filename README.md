@@ -4,9 +4,12 @@ An Egg-Timer App
 
 - [Install](#install)
 - [Development](#development)
+  - [Setup](#setup)
+  - [Run](#run)
   - [Gtk Inspector](#gtk-inspector)
   - [Sound Creation](#sound-creation)
   - [Thread Check](#thread-check)
+  - [Debug](#debug)
 - [Sources](#sources)
 
 ---
@@ -24,7 +27,46 @@ If the egg icon doesn't appear in the panel, run `tail -f ~/.xsession-errors` to
 
 ## Development
 
-Run:
+```sh
+cd ./src
+uv run python -m eggtimer --loglevel=info
+```
+
+### Setup
+
+1. Install `uv` (if not already installed): https://docs.astral.sh/uv/getting-started/installation/
+1. Initialize (if not already initialized): `uv init [--python <VERSION>]`
+    - If you need to change the Python version: `uv python pin <VERSION>`
+1. Install a specific version of Python: `uv python install <VERSION>`
+1. Install listed deps (pyproject.toml or requirements.txt): `uv sync`
+1. Deps:
+    ```sh
+    uv (add/remove) <PACKAGE> <PACKAGE>
+    uv (add/remove) --dev <PACKAGE> <PACKAGE>
+    
+    uv tool (install/uninstall) ruff
+    ```
+1. `venv`
+    ```sh
+    # on
+    source .venv/bin/activate
+    
+    # off
+    deactivate
+    ```
+1. Cache
+    ```sh
+    # print the cache location
+    uv cache dir
+    
+    # clear the cache
+    uv cache clean
+    ```
+
+sudo apt install libgirepository-2.0-dev
+
+
+### Run
 ```sh
 ./dist/app.py --loglevel=info
 ```
@@ -67,6 +109,35 @@ ps -T -p <PID>
 # has started. After the Timer has completed, the number of items should reset.
 # A new Thread will show up in the CMD column under `<NAME>.py` (NAME being the
 # script that started the Thread).
+```
+
+
+### Debug
+
+```sh
+# With faulthandler ============================================================
+
+PYTHONFAULTHANDLER=1 python ./dist/app.py --loglevel=info
+
+# With Python Debugger =========================================================
+
+python -m pdb ./dist/app.py --loglevel=info
+# type 'continue' to start
+# type 'run' to restart
+
+# With GNU Debugger ============================================================
+
+# If `python3-dbg` isn't installed, do so
+sudo apt install libglib2.0-0t64-dbgsym python3-dbg
+
+# Start session (*)
+gdb python
+(gdb) run ./dist/app.py --loglevel=info
+# Once the error occurs, start viewing the backtrace
+(gdb) bt
+
+# (*) If you get warnings regarding "could not find '.gnu_debugaltlink'", you're likely missing the debug symbols for the specified package. Ubuntu based systems have a Debuginfod server which detects the missing symbols and will fetch them. To enable this, you'd have to change the initial `gdb` command to this:
+export DEBUGINFOD_URLS="https://debuginfod.ubuntu.com"; gdb python
 ```
 
 ---
