@@ -1,7 +1,13 @@
+# Monkey-patch for customtkinter. It was referencing an old module that can't be upgraded.
+# This forces Python to map the old namespace to the correct new location before customtkinter attempts to look for it.
+import collections
+import collections.abc
+collections.Sequence = collections.abc.Sequence
+
 import argparse
 import logging
 import tkinter as tk
-from tkinter import ttk
+# from tkinter import ttk
 
 import customtkinter
 from customtkinter import (
@@ -10,14 +16,18 @@ from customtkinter import (
   DrawEngine,
   FontManager,
 )
-from ttkthemes import ThemedTk
+# from ttkthemes import ThemedTk
 
-from eggtimer.widgets import (
-    ColorPickerBtn,
-    EditableTimer,
-    TimerForm,
-    TimersList,
-)
+# TODO may need to update widget paths to be relative (just a leading dot)?
+# from .widgets import (
+#     ColorPickerBtn,
+#     EditableTimer,
+#     TimerForm,
+#     TimersList,
+# )
+
+# TODO I installed tkinter but it didn't update pyproject or uv.lock. I can't use
+# `uv add` because it doesn't seem to allow for specifying the module install path.
 
 parser = argparse.ArgumentParser(
     prog="Egg Timer",

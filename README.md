@@ -4,9 +4,9 @@ An Egg-Timer App
 
 - [Install](#install)
 - [Development](#development)
-  - [Setup](#setup)
-  - [Run](#run)
-  - [Gtk Inspector](#gtk-inspector)
+  - [Run Container](#run-container)
+  - [Installing modules](#installing-modules)
+  - [Run App (within running container)](#run-app-within-running-container)
   - [Sound Creation](#sound-creation)
   - [Thread Check](#thread-check)
   - [Debug](#debug)
@@ -27,65 +27,31 @@ If the egg icon doesn't appear in the panel, run `tail -f ~/.xsession-errors` to
 
 ## Development
 
-```sh
-cd ./src
-uv run python -m eggtimer --loglevel=info
-```
 
-### Setup
-
-1. Install `uv` (if not already installed): https://docs.astral.sh/uv/getting-started/installation/
-1. Initialize (if not already initialized): `uv init [--python <VERSION>]`
-    - If you need to change the Python version: `uv python pin <VERSION>`
-1. Install a specific version of Python: `uv python install <VERSION>`
-1. Install listed deps (pyproject.toml or requirements.txt): `uv sync`
-1. Deps:
-    ```sh
-    uv (add/remove) <PACKAGE> <PACKAGE>
-    uv (add/remove) --dev <PACKAGE> <PACKAGE>
-    
-    uv tool (install/uninstall) ruff
-    ```
-1. `venv`
-    ```sh
-    # on
-    source .venv/bin/activate
-    
-    # off
-    deactivate
-    ```
-1. Cache
-    ```sh
-    # print the cache location
-    uv cache dir
-    
-    # clear the cache
-    uv cache clean
-    ```
-
-sudo apt install libgirepository-2.0-dev
-
-
-### Run
-```sh
-./dist/app.py --loglevel=info
-```
-If it shows up in your Panel, success! Otherwise run `tail -f ~/.xsession-errors` to see if there were any errors.
-
-
-### Gtk Inspector
-
-To view Gtk component hiearchies and style classes/names, you'll need the `GtkInspector`.
+### Run Container
 
 ```sh
-# If `libgtk-3-dev` isn't installed, do so
-sudo apt install libgtk-3-dev
-
-# Enable with
-gsettings set org.gtk.Settings.Debug enable-inspector-keybinding true
+source ./bin/repo-funcs.sh
+buildcont  # if not already built
+startcont
 ```
 
-With an App/Window focused, hit `CTRL+SHIFT+I` and it should open with that App's items listed in the Objects view. Click on the lightbulb icon to `Show Details`, then click the drop-down and select `CSS nodes`.
+
+### Installing modules
+
+```sh
+# First run, install all project modules
+uv pip install -t $PYTHONPATH -r pyproject.toml
+
+# Install individual modules
+uv pip install -t $PYTHONPATH <MODULE>==<MODULE_VERSION>
+```
+
+### Run App (within running container)
+
+```sh
+python -m src.eggtimer --loglevel=info
+```
 
 
 ### Sound Creation
