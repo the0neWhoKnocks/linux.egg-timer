@@ -2,6 +2,7 @@ services:
   eggtimer:
     build:
       args:
+        APP_DIR: $APP_DIR
         APP_GID: $CURR_GID
         APP_GROUP: $APP_USER
         APP_UID: $CURR_UID
@@ -13,6 +14,15 @@ services:
     environment:
       DISPLAY: $DISPLAY # set on Linux systems
       TZ: America/Los_Angeles
+      # =====
+      PY_MODULES: "$APP_DIR/python_modules"
+      PYTHONPATH: "$APP_DIR/python_modules:$APP_DIR/src"
+      UV_CACHE_DIR: "${APP_DIR}/.uv/cache"
+      UV_PYTHON_BIN_DIR: "${APP_DIR}/.uv/bin"
+      UV_PYTHON_CACHE_DIR: "${APP_DIR}/.uv/cache"
+      UV_PYTHON_INSTALL_DIR: "${APP_DIR}/.uv/bin"
+      UV_TOOL_BIN_DIR: "${APP_DIR}/.uv/bin"
+      UV_TOOL_DIR: "${APP_DIR}/.uv/tools"
     hostname: $CONTAINER_HOSTNAME # set in `repo-funcs`
     # ports:
     #   - "3001:3000"

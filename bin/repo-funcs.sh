@@ -10,6 +10,7 @@ export REPO_FUNCS=()
 export CURR_UID=$(id -u)
 export CURR_GID=$(id -g)
 export APP_USER="snake"
+export APP_DIR="/home/${APP_USER}/app"
 
 REPO_FUNCS+=("buildcont")
 function buildcont {

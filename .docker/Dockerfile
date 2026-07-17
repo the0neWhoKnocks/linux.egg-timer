@@ -29,6 +29,7 @@ ENV IN_CONTAINER=true \
 # COPY --from=builder /root/.local /root/.local
 
 # Create a group and user
+ARG APP_DIR
 ARG APP_GID
 ARG APP_GROUP
 ARG APP_UID
@@ -37,17 +38,15 @@ RUN addgroup --gid "$APP_GID" "$APP_GROUP" \
   && adduser --uid "$APP_UID" --ingroup "$APP_GROUP" --disabled-password --home "/home/$APP_USER" "$APP_USER"
 # Install tk for the `libtk8.6.so` lib
 RUN apk add --no-cache --update tk
-ENV APP_DIR="/home/$APP_USER/app"
 # Set up a usable terminal experience for development
 COPY ./.docker/.zshrc "/home/$APP_USER/"
 COPY ./.docker/zsh-autosuggestions.zsh "/home/$APP_USER/"
 RUN mkdir -p "$APP_DIR" && chown -R $APP_USER:$APP_GROUP "/home/$APP_USER"*
 WORKDIR "$APP_DIR"
 # Change to non-root user
-USER snake
+USER $APP_USER
 # COPY ./requirements.txt .
 # RUN pip install --target "$APP_DIR/python_modules" -r ./requirements.txt
-ENV PYTHONPATH="$APP_DIR/python_modules"
 
 # CMD ["python", "main.py"]
 

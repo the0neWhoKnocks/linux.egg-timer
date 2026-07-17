@@ -21,9 +21,9 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=3'
 source "$HOME/zsh-autosuggestions.zsh"
 
 alias ll="ls -la"
-alias nr="npm run"
 alias ss="source $HOME/.zshrc"
-alias vi="vim"
+alias uv-add="uv pip install -t $PY_MODULES"
+alias uv-sync="uv pip install -t $PY_MODULES -r ./pyproject.toml --system"
 
 NL=$'\n'                                                                        
 PROMPT="${NL}%F{blue}%/%f ${NL}%F{green}>%f "

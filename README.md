@@ -41,16 +41,17 @@ startcont
 
 ```sh
 # First run, install all project modules
-uv pip install -t $PYTHONPATH -r pyproject.toml
+uv-sync  # Alias to ensure modules install properly in Docker container.
+uv python install cpython-3.14-linux-x86_64-gnu  # This is only for development and allows for your IDE to point to a local Python binary.
 
 # Install individual modules
-uv pip install -t $PYTHONPATH <MODULE>==<MODULE_VERSION>
+uv-add <MODULE>==<MODULE_VERSION>
 ```
 
 ### Run App (within running container)
 
 ```sh
-python -m src.eggtimer --loglevel=info
+python -m eggtimer --loglevel=info
 ```
 
 

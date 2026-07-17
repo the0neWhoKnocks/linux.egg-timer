@@ -1,0 +1,5 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.uv/bin/cpython-3.14.3-linux-x86_64-gnu/bin/python",
+  "python.terminal.activateEnvironment": false,
+  "ruff.interpreter": ["${workspaceFolder}/.uv/bin/cpython-3.14.3-linux-x86_64-gnu/bin/python"]
+}

@@ -12,5 +12,8 @@ dependencies = [
     # "ttkthemes==3.3.0",
 ]
 
+[tool.ty.environment]
+extra-paths = ["./python_modules"]  # so the ruff linter picks up modules installed via container
+
 [tool.uv]
 link-mode = "copy"
