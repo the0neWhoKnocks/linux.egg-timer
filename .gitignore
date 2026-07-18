@@ -1,4 +1,4 @@
-# Python-generated files
+# Generated files
 .ruff_cache
 __pycache__/
 *.py[oc]
@@ -6,10 +6,9 @@ build/
 #dist/
 wheels/
 *.egg-info
-
-# Virtual environments
-.uv
+.pdm-python
 
 # Project folders
+__pypackages__
 .ignore
 python_modules

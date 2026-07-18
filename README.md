@@ -40,12 +40,21 @@ startcont
 ### Installing modules
 
 ```sh
-# First run, install all project modules
-uv-sync  # Alias to ensure modules install properly in Docker container.
-uv python install cpython-3.14-linux-x86_64-gnu  # This is only for development and allows for your IDE to point to a local Python binary.
+#############
+# First run #
+#############
+pdm sync  # install all project modules
+pdm python install 3.14  # This is only for development and allows for your IDE to point to a local Python binary.
 
+###############
+# Development #
+###############
+# Search for module and what versions are available
+pip index versions <MODULE>
 # Install individual modules
-uv-add <MODULE>==<MODULE_VERSION>
+pdm add <MODULE>==<MODULE_VERSION>
+# Un-install individual modules
+pdm remove <MODULE>
 ```
 
 ### Run App (within running container)

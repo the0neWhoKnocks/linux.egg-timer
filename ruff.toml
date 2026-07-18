@@ -21,6 +21,7 @@ ignore = [
   "D202",    # blank-line-after-function
   "E501",    # line-too-long
   "ERA001",  # commented-out-code
+  "FIX002",  # line-contains-todo
   "PTH118",  # os-path-join
   "PTH120",  # os-path-dirname
   "PTH123",  # builtin-open

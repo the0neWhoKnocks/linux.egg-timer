@@ -2,26 +2,21 @@ import argparse
 import logging
 import tkinter as tk
 
-# from tkinter import ttk
-import customtkinter
 from customtkinter import (
-    CTkButton,
+    CTk,
     CTkEntry,
-    CTkFont,
     DrawEngine,
-    FontManager,
+    ThemeManager,
+    set_default_color_theme,
 )
 
-# from ttkthemes import ThemedTk
+from eggtimer.constants import FONT__MONO__FAMILY, FONT__MONO__SIZE
 from eggtimer.widgets import (
     ColorPickerBtn,
     EditableTimer,
     TimerForm,
     TimersList,
 )
-
-# TODO I installed tkinter but it didn't update pyproject or uv.lock. I can't use
-# `uv add` because it doesn't seem to allow for specifying the module install path.
 
 parser = argparse.ArgumentParser(
     prog="Egg Timer",
@@ -42,32 +37,20 @@ logging.basicConfig(
 )
 
 
-# class EggTimer(ThemedTk):
-class EggTimer(customtkinter.CTk):
+class EggTimer(CTk):
     def __init__(self) -> None:
-        # super().__init__(theme="plastik")
         super().__init__()
-        # print("Available themes:", self.get_themes())
-        # Themes: adapta, alt, aquativo, arc, black, blue, breeze (KDE), clam, classic, clearlooks, default, elegance, equilux, itft1, keramik, kroc, plastik, radiance, scidblue, scidgreen, scidgrey, scidmint, scidpink, scidpurple, scidsand, smog, ubuntu, winxpblue, yaru (Ubuntu)
-        self.title("Egg Timer")
-        # self.geometry("400x300")  # Set the window size
-        # self.build_ui()
         
+        set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "gold", "green", "dark-blue" | https://github.com/TomSchimansky/CustomTkinter/tree/master/customtkinter/assets/themes
+        DrawEngine.preferred_drawing_method = "font_shapes"  # "circle_shapes", "font_shapes", "polygon_shapes"
+        ThemeManager.theme["CTkFont"]["family"] = FONT__MONO__FAMILY  # set a global font for theme | https://github.com/TomSchimansky/CustomTkinter/blob/master/customtkinter/assets/themes/dark-blue.json
+        ThemeManager.theme["CTkFont"]["size"] = FONT__MONO__SIZE
         # print( tk.font.families() )
         
-        # https://github.com/TomSchimansky/CustomTkinter/discussions/2156
-        # TODO try to reference font relatively
-        customtkinter.FontManager.load_font("/home/snake/app/src/eggtimer/assets/FantasqueSansMNerdFontMono-Regular.ttf")
-        # customtkinter.FontManager.load_font("/usr/share/fonts/truetype/FantasqueSansMNerdFontMono-Regular.ttf")
-        # TODO default font not working
-        self.defaultFont = customtkinter.CTkFont(family="FantasqueSansM Nerd Font Mono", size=18)
-        self.configure(font=self.defaultFont)
-        # DrawEngine.preferred_drawing_method = "polygon_shapes"
-        DrawEngine.preferred_drawing_method = "font_shapes"
-        # DrawEngine.preferred_drawing_method = "circle_shapes"
-        # button = CTkButton(self, text="My Button", command=lambda: print("click"))
-        button = CTkButton(self, text="My Button", font=("FantasqueSansM Nerd Font Mono", 24), command=lambda: print("click"))
-        button.pack(padx=20, pady=20)
+        self.title("Egg Timer")
+        self.geometry("400x300")  # Set the window size
+        
+        self.build_ui()
     
     @staticmethod
     def add_timer_to_list(cp: ColorPickerBtn, input: CTkEntry, timer: EditableTimer, list: TimersList) -> None:  # noqa: A002
@@ -86,6 +69,7 @@ class EggTimer(customtkinter.CTk):
     def build_ui(self) -> None:
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=0)
+        timers_list = TimersList(self)
         create_form = TimerForm(self, btn_label="Add Timer", btn_handler=lambda: EggTimer.add_timer_to_list(
           cp=create_form.cp,
           input=create_form.input,
@@ -95,9 +79,8 @@ class EggTimer(customtkinter.CTk):
         create_form.grid(row=0, column=0, sticky="NWE", padx=5, pady=5)
         
         self.rowconfigure(1, weight=1)
-        timers_list = TimersList(self)
         timers_list.grid(row=1, column=0, sticky="NWSE", padx=5, pady=5)
-        timers_list.configure(borderwidth=1, relief="sunken", height=200)
+        timers_list.configure(border_width=1, height=200)
 
 
 if __name__ == "__main__":

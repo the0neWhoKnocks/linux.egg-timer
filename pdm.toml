@@ -1,0 +1,5 @@
+# https://pdm-project.org/latest/reference/configuration/
+# Not all options can be set in `pyproject.toml`.
+
+[python]
+install_root = "__pypackages__"  # install python in this folder

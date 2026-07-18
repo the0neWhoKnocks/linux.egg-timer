@@ -20,10 +20,10 @@ setopt SHARE_HISTORY          # Share history between all sessions.
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=3'
 source "$HOME/zsh-autosuggestions.zsh"
 
+export PATH="$HOME/.local/bin:$PATH" # make pdm available in shell
+
 alias ll="ls -la"
 alias ss="source $HOME/.zshrc"
-alias uv-add="uv pip install -t $PY_MODULES"
-alias uv-sync="uv pip install -t $PY_MODULES -r ./pyproject.toml --system"
 
 NL=$'\n'                                                                        
 PROMPT="${NL}%F{blue}%/%f ${NL}%F{green}>%f "

@@ -15,14 +15,7 @@ services:
       DISPLAY: $DISPLAY # set on Linux systems
       TZ: America/Los_Angeles
       # =====
-      PY_MODULES: "$APP_DIR/python_modules"
-      PYTHONPATH: "$APP_DIR/python_modules:$APP_DIR/src"
-      UV_CACHE_DIR: "${APP_DIR}/.uv/cache"
-      UV_PYTHON_BIN_DIR: "${APP_DIR}/.uv/bin"
-      UV_PYTHON_CACHE_DIR: "${APP_DIR}/.uv/cache"
-      UV_PYTHON_INSTALL_DIR: "${APP_DIR}/.uv/bin"
-      UV_TOOL_BIN_DIR: "${APP_DIR}/.uv/bin"
-      UV_TOOL_DIR: "${APP_DIR}/.uv/tools"
+      PYTHONPATH: "$APP_DIR/__pypackages__/3.14/lib:$APP_DIR/src"
     hostname: $CONTAINER_HOSTNAME # set in `repo-funcs`
     # ports:
     #   - "3001:3000"

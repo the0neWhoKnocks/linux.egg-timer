@@ -8,12 +8,11 @@ dependencies = [
     "argparse==1.4.0",
     "customtkinter==6.0.0",
     "packaging==26.2",
-    # "timedelta==2020.12.3",
-    # "ttkthemes==3.3.0",
 ]
 
-[tool.ty.environment]
-extra-paths = ["./python_modules"]  # so the ruff linter picks up modules installed via container
+[tool.pdm]  # https://pdm-project.org/latest/reference/configuration/
+distribution = false  # prevent pdm from 'installing' modules in 'src' and updating while adding/removing.
+python.use_venv = false
 
-[tool.uv]
-link-mode = "copy"
+[tool.ty.environment]
+extra-paths = ["./__pypackages__/3.14/lib"]  # so the ruff linter picks up modules installed via container

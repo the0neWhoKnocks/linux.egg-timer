@@ -1,15 +1,16 @@
-from tkinter import Canvas, colorchooser
+from tkinter import Canvas, Event, colorchooser
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from tkinter import Event, Tk
+    
+    from customtkinter import CTkFrame
 
 from eggtimer.constants import MOUSE_BTN__LEFT
 
 
 class ColorPickerBtn(Canvas):
-    def __init__(self, parent: Tk, w: int = 30, h: int = 25, color_hex: str = "#00C487", pick_handler: Callable | None = None) -> None:
+    def __init__(self, parent: CTkFrame, w: int = 30, h: int = 25, color_hex: str = "#00C487", pick_handler: Callable | None = None) -> None:
         super().__init__(parent, width=w, height=h)
         self.w = w
         self.h = h

@@ -3,9 +3,9 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
-    from tkinter import Tk
 
 from customtkinter import (
+    CTk,
     CTkButton,
     CTkEntry,
     CTkFrame,
@@ -21,7 +21,7 @@ log = logging.getLogger(LOGGER_NAMESPACE)
 
 
 class TimerForm(CTkFrame):
-    def __init__(self, parent: Tk, btn_label: str, btn_handler: Callable) -> None:
+    def __init__(self, parent: CTk, btn_label: str, btn_handler: Callable) -> None:
         super().__init__(parent)
         self.cp = ColorPickerBtn(self, pick_handler=lambda c: log.info("User chose color '%s' for timer", c))
         self.cp.grid(row=0, column=0)
