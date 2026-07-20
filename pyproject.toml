@@ -8,6 +8,7 @@ dependencies = [
     "argparse==1.4.0",
     "customtkinter==6.0.0",
     "packaging==26.2",
+    "pillow==12.3.0",
 ]
 
 [tool.pdm]  # https://pdm-project.org/latest/reference/configuration/

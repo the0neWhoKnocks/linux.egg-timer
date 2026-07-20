@@ -48,7 +48,7 @@ class EggTimer(CTk):
         # print( tk.font.families() )
         
         self.title("Egg Timer")
-        self.geometry("400x300")  # Set the window size
+        self.geometry("600x300")  # Set the window size
         
         self.build_ui()
     
