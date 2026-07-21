@@ -32,8 +32,16 @@ ARG APP_UID
 ARG APP_USER
 RUN addgroup --gid "$APP_GID" "$APP_GROUP" \
   && adduser --uid "$APP_UID" --ingroup "$APP_GROUP" --disabled-password --home "/home/$APP_USER" "$APP_USER"
-# Install tk for the `libtk8.6.so` lib
-RUN apt-get update && apt-get install -y tk \
+# - `tk` for the `libtk8.6.so` lib for tkinter rendering
+# - `alsa-utils mpg123 pipewire-alsa` allows for audio passthrough
+#   - `alsa-utils`: Installs `aplay`, which `playsound3` explicitly searches for on Linux to execute audio processing.
+#   - `mpg123`: Installs the command-line decoder needed if scripts plays `.mp3` files.
+#   - `pipewire-alsa`: This is the crucial bridge. It intercepts standard ALSA audio calls made by aplay inside the container and transparently re-routes them directly out to your host machine's PipeWire daemon.
+# - `dbus dbus-x11 libnotify-bin python3-dbus python3-gi` allows for notifications passthrough
+RUN apt-get update && apt-get install -y \
+  tk \
+  alsa-utils mpg123 pipewire-alsa \
+  dbus dbus-x11 libnotify-bin python3-dbus python3-gi \
   && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 # Set up a usable terminal experience for development
 COPY ./.docker/.zshrc "/home/$APP_USER/"

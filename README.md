@@ -49,7 +49,7 @@ pdm python install 3.14  # This is only for development and allows for your IDE 
 ###############
 # Development #
 ###############
-# Search for module and what versions are available
+# Search for module and what versions are available (or look on https://pypi.org/)
 pip index versions <MODULE>
 # Install individual modules
 pdm add <MODULE>==<MODULE_VERSION>

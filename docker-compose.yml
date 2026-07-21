@@ -12,26 +12,30 @@ services:
     command: tail -F /dev/null # starts the container, and keeps it running
     container_name: eggtimer
     environment:
-      DISPLAY: $DISPLAY # set on Linux systems
+      # [System]
       TZ: America/Los_Angeles
-      # =====
+      # [Audio/Video]
+      DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/$CURR_UID/bus" # notifications
+      DISPLAY: $DISPLAY # set by default on Unix systems
+      XDG_RUNTIME_DIR: /tmp # audio
+      # [App]
       PYTHONPATH: "$APP_DIR/__pypackages__/3.14/lib:$APP_DIR/src"
     hostname: $CONTAINER_HOSTNAME # set in `repo-funcs`
-    # ports:
-    #   - "3001:3000"
+    security_opt:
+      - apparmor=unconfined # for notifications
     user: "${CURR_UID}:${CURR_GID}"
     volumes:
       # Map shell files over, so they're maintained between sessions.
       - type: bind
-        # read_only: true
         source: "${PWD}/.docker/.zshrc"
         target: "/home/$APP_USER/.zshrc"
       - type: bind
-        # read_only: true
         source: "${PWD}/.ignore"
         target: "/home/$APP_USER/dev" # allows for .zsh_history to be written
       # Map the current directory to the Container's WORKDIR
       - "${PWD}:/home/$APP_USER/app"
-      # Map system files to Container so it can display visual output.
-      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      # Map system files to Container so it can pass audio/visual output.
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket # display
+      - /run/user/$CURR_UID/bus:/run/user/$CURR_UID/bus # notifications | can verify path with `echo $DBUS_SESSION_BUS_ADDRESS`
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw # display
+      - "$XDG_RUNTIME_DIR/pipewire-0:/tmp/pipewire-0" # audio | XDG_RUNTIME_DIR currently is `/run/user/<UID>`

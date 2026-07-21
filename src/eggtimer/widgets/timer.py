@@ -11,7 +11,7 @@ from customtkinter import (
 )
 from PIL import Image
 
-from eggtimer.constants import MODULE_DIR
+from eggtimer.constants import APP_DIR
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -52,7 +52,9 @@ class Timer(CTkFrame):
         hours: str,
         minutes: str,
         seconds: str,
-        delete_handler: Callable | None = None,
+        delete_handler: Callable,
+        done_handler: Callable,
+        stop_handler: Callable,
     ) -> None:
         super().__init__(parent, border_width=1)
         
@@ -60,16 +62,19 @@ class Timer(CTkFrame):
         self.total_secs = float((int(hours) * 3600) + (int(minutes) * 60) + int(seconds))
         
         self.color = color
+        self.completed = False
         self.delete_handler = delete_handler
+        self.done_handler = done_handler
         self.name = name
         self.render_loop = None
         self.root = root
         self.running = False
+        self.stop_handler = stop_handler
         
         self.build_ui()
     
     def build_ui(self) -> None:
-        icons_sprite_sheet = Image.open(f"{MODULE_DIR}/assets/icons.png")
+        icons_sprite_sheet = Image.open(f"{APP_DIR}/assets/icons/app/icons.png")
         self.icons = {
           "play": self.scale_img(x_ndx=0, sheet=icons_sprite_sheet),
           "stop": self.scale_img(x_ndx=1, sheet=icons_sprite_sheet),
@@ -85,6 +90,7 @@ class Timer(CTkFrame):
         self.color_chip.pack(side="left", padx=2, pady=2)
         self.label = CTkLabel(self, text=self.name)
         self.label.pack(side="left", padx=X_SPACING)
+        # TODO: add Edit button
         self.delete_btn = CTkButton(self,
           text="Delete",
           command=self.delete_timer,
@@ -106,11 +112,10 @@ class Timer(CTkFrame):
         if self.render_loop is not None:
             self.root.after_cancel(self.render_loop)
         
-        if (self.delete_handler):
-            self.delete_handler()
+        self.delete_handler()
     
     def render(self) -> None:
-        if not self.running:
+        if not self.running and not self.completed:
             return
         
         current_time = time()
@@ -125,8 +130,8 @@ class Timer(CTkFrame):
         if remaining_time > 0:
             self.render_loop = self.root.after(100, self.render)  # check in milliseconds so the UI responds quickly to clicks
         else:
-            # TODO: play sound, and reset after User clicks stop
-            self.toggle_timer_btn()
+            self.completed = True
+            self.done_handler()
     
     def toggle_timer_btn(self, _ev: Event | None = None) -> None:
         self.running = not self.running
@@ -148,3 +153,5 @@ class Timer(CTkFrame):
             )
             
             self.time.configure(text=self.start_time_str)
+            
+            self.stop_handler()

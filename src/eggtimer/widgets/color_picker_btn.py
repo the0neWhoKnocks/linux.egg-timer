@@ -1,5 +1,7 @@
-from tkinter import Canvas, Event, colorchooser
+from tkinter import Canvas, Event
 from typing import TYPE_CHECKING
+
+from CTkColorPicker import AskColor
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -20,10 +22,16 @@ class ColorPickerBtn(Canvas):
         self.render()
     
     def handle_click(self, _ev: Event) -> None:
-        rgb, hex = colorchooser.askcolor(title="Pick Color", color=self.color)  # noqa: A001, RUF059
-        if hex:
-            self.color = hex
+        result = AskColor(
+          initial_color=self.color,
+          title="Pick Timer Color",
+        )
+        color = result.get()
+        
+        if color:
+            self.color = color
             self.render()
+            
             if self.handler:
                 self.handler(self.color)
     
