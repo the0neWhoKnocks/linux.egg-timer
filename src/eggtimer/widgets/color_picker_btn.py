@@ -29,8 +29,7 @@ class ColorPickerBtn(Canvas):
         color = result.get()
         
         if color:
-            self.color = color
-            self.render()
+            self.set_color(color)
             
             if self.handler:
                 self.handler(self.color)
@@ -40,3 +39,7 @@ class ColorPickerBtn(Canvas):
         self.create_rectangle(0 + bw, 0 + bw, self.w - bw, self.h - bw, fill="#CCCCCC", outline="#666666", width=bw)
         offset = 4
         self.create_rectangle(offset + bw, offset + bw, self.w - (offset + bw), self.h - (offset + bw), fill=self.color, outline="#000000", width=bw)
+    
+    def set_color(self, color: str) -> None:
+        self.color = color
+        self.render()

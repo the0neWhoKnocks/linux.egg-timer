@@ -9,8 +9,6 @@ dependencies = [
     "CTkColorPicker==0.9.0",
     "customtkinter==6.0.0",
     "desktop-notifier==6.2.0",
-    "packaging==26.2",
-    "pillow==12.3.0",
     "platformdirs==4.10.1",
     "playsound3==3.3.2",
 ]

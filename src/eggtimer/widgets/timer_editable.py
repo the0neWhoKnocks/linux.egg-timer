@@ -3,14 +3,17 @@ from tkinter.ttk import Spinbox
 
 from customtkinter import CTkFont, CTkFrame, CTkLabel
 
-from eggtimer.constants import FONT__MONO__FAMILY, FONT__MONO__SIZE
+from eggtimer.constants import (
+  FONT__DEFAULT__FAMILY,
+  FONT__DEFAULT__SIZE,
+)
 
 
 # TODO: custom SpinBox https://customtkinter.tomschimansky.com/tutorial/spinbox/
 # https://tkdocs.com/shipman/spinbox.html
 class BaseSpinBox(Spinbox):
     def __init__(self, parent: CTkFrame, to: int, textvariable: Variable) -> None:
-        mono_font = CTkFont(family=FONT__MONO__FAMILY, size=FONT__MONO__SIZE)
+        mono_font = CTkFont(family=FONT__DEFAULT__FAMILY, size=FONT__DEFAULT__SIZE)  # can't use a tuple, have to use CTkFont to ensure this non-CTk widget's text looks like the other widgets
         super().__init__(
           parent,
           font=mono_font,
